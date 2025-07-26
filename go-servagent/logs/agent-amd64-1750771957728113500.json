@@ -1,0 +1,45 @@
+[
+  {
+    "time": "2025-06-30T15:30:09.5018041+03:00",
+    "command": "gHN",
+    "output": {
+      "hostname": "B4-R408-PC07"
+    }
+  },
+  {
+    "time": "2025-06-30T15:30:12.4780041+03:00",
+    "command": "gCPU",
+    "output": {
+      "cpu0.cores": "2",
+      "cpu0.mhz": "3600.00",
+      "cpu0.model": "Intel(R) Pentium(R) CPU G4520 @ 3.60GHz",
+      "cpu0.physical_id": "BFEBFBFF000506E3"
+    }
+  },
+  {
+    "time": "2025-06-30T15:30:16.1410041+03:00",
+    "command": "gRAM",
+    "output": {
+      "TotalGB": "7.88",
+      "r0.Capacity": "8589934592",
+      "r0.Manufacturer": "88F2",
+      "r0.PartNumber": "FL2133D4U15-8GH",
+      "r0.SerialNumber": "00000000",
+      "r0.Speed": "2133"
+    }
+  },
+  {
+    "time": "2025-06-30T15:36:32.7258041+03:00",
+    "command": "gHN",
+    "output": {
+      "hostname": "B4-R408-PC07"
+    }
+  },
+  {
+    "time": "2025-06-30T15:37:18.0498041+03:00",
+    "command": "gHN",
+    "output": {
+      "hostname": "B4-R408-PC07"
+    }
+  }
+]

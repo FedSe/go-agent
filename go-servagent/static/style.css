@@ -1,0 +1,17 @@
+body {
+    font-family: 'Varela Round', sans-serif;
+    background-color: #f8f9fa;
+    color: #212529;
+    padding: 20px;
+}
+.card {
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+pre {
+    background-color: #212529;
+    color: #ffffff;
+    padding: 10px;
+    border-radius: 5px;
+    max-height: 300px;
+    overflow-y: auto;
+}

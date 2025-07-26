@@ -1,0 +1,175 @@
+{{ define "title" }}Группы{{ end }}
+{{ define "body" }}
+
+<h1 class="mb-4">Управление группами</h1>
+
+<!-- Форма создания группы -->
+<div class="card mb-4">
+    <div class="card-header">Создать новую группу</div>
+    <div class="card-body">
+        <form action="/group/create" method="POST">
+            <input type="text" name="group_name" class="form-control" placeholder="Имя группы">
+            <button type="submit" class="btn btn-success mt-2">Создать группу</button>
+        </form>
+    </div>
+</div>
+
+<!-- Список групп -->
+{{ if .Groups }}
+    {{ range .Groups }}
+        {{ $groupName := .Name }}
+
+        <div class="card mb-4">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ .Name }}</h5>
+                <div class="btn-group">
+                    <a href="#" class="btn btn-primary btn-sm me-2"
+                       data-bs-toggle="modal" 
+                       data-bs-target="#addMembersModal" 
+                       onclick="setCurrentGroup('{{ .Name }}')">
+                        Добавить участников
+                    </a>
+                    <button type="button" class="btn btn-outline-danger btn-sm"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#confirmDeleteModal"
+                            onclick="setGroupToDelete('{{ .Name }}')">
+                        Удалить группу
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+							<th>Имя хоста</th>
+							<th>ID клиента</th>
+							<th>IP-адрес</th>
+							<th>Последняя активность</th>
+                            <th>Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ range .Members }}
+                            <tr>
+								<td>{{ .Hostname }}</td>
+                                <td>{{ .ID }}</td>
+								<td>{{ .IP }}</td>
+								<td>{{ .LastActiveTime.Format "2006-01-02 15:04:05" }}</td>
+                                <td>
+                                    <form action="/group/remove" method="POST">
+                                        <input type="hidden" name="group_name" value="{{ $groupName }}">
+                                        <input type="hidden" name="client_id" value="{{ .ID }}">
+                                        <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {{ else }}
+                            <tr><td colspan="2" class="text-muted">Нет участников</td></tr>
+                        {{ end }}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {{ end }}
+{{ else }}
+    <p class="text-muted">Нет созданных групп</p>
+{{ end }}
+
+
+<!-- Модаль: Добавить участников -->
+<div class="modal fade" id="addMembersModal" tabindex="-1" aria-labelledby="addMembersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addMembersModalLabel">Добавить участников в группу 
+                    <span id="currentGroupName" style="font-weight: bold;"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addMembersForm" action="/group/add" method="POST">
+                    <input type="hidden" name="group_name" id="modal-group-name">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Выбрать</th>
+								<th>Имя хоста</th>
+                                <th>ID клиента</th>
+                                <th>IP</th>
+                                <th>Последняя активность</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientTableBody">
+                            <!-- Здесь будут клиенты из JS -->
+                        </tbody>
+                    </table>
+                    <button type="submit" class="btn btn-primary mt-3">Добавить выделенных</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Модаль: Подтверждение удаления группы -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Подтвердите удаление</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Вы уверены, что хотите удалить группу "<span id="groupToDeleteName"></span>"?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <form id="deleteGroupForm" action="/group/delete" method="POST">
+                    <input type="hidden" name="group_name" id="deleteGroupNameInput" value="">
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/static/bootstrap-5.3.6/js/bootstrap.bundle.min.js"></script>
+
+<!-- Логика для модальных окон -->
+<script>
+let currentGroupName = "";
+
+function setCurrentGroup(groupName) {
+    currentGroupName = groupName;
+    document.getElementById("modal-group-name").value = currentGroupName;
+    document.getElementById("currentGroupName").innerText = currentGroupName;
+
+    const tbody = document.getElementById("clientTableBody");
+    tbody.innerHTML = "";
+
+    fetch(`/api/group/available?group_name=${groupName}`)
+        .then(res => res.json())
+        .then(clients => {
+            clients.forEach(client => {
+                const row = `
+                    <tr>
+                        <td><input type="checkbox" name="client_id" value="${client.id}"></td>
+						<td>${client.hostname}</td>
+                        <td>${client.id}</td>
+                        <td>${client.ip}</td>
+                        <td>${client.last_active_time}</td>
+                    </tr>`;
+                tbody.innerHTML += row;
+            });
+        })
+        .catch(err => console.error("Ошибка загрузки клиентов:", err));
+}
+
+function setGroupToDelete(groupName) {
+    document.getElementById("deleteGroupNameInput").value = groupName;
+    document.getElementById("groupToDeleteName").innerText = groupName;
+}
+</script>
+
+{{ end }}
