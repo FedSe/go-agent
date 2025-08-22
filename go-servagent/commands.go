@@ -30,7 +30,7 @@ func sendCommandToClient(clientID string, command string) error {
 	if err != nil {
 		log.Printf("Ошибка отправки команды клиенту %s: %v\n", clientID, err)
 
-		// Сброс соединение при ошибке
+		// Сброс соединения при ошибке
 		connsMu.Lock()
 		delete(activeConns, clientID)
 		connsMu.Unlock()

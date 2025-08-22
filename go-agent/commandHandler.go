@@ -37,20 +37,15 @@ func handleCommand(msg CommandMessage) ResponseMessage {
 		return response
 	case "gRAM":
 		response.Command = "gRAM"
-		totalGB, err := getRAMInfo()
-		if err != nil {
-			response.Error = err.Error()
-			return response
-		}
-
 		ramModules, err := getRAMModules()
 		if err != nil {
 			response.Error = err.Error()
 			return response
 		}
 
-		response.Data = formatRAMData(totalGB, ramModules)
+		response.Data = formatRAMData(ramModules)
 		return response
+
 	default:
 		// Выполнить как PS
 		script := `[Console]::OutputEncoding = [Text.Encoding]::UTF8;` + msg.Command

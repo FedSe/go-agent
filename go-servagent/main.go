@@ -8,13 +8,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const webport = ":8080"
 const clientport = ":8081"
+const webport = ":8080"
 
 func main() {
 	initGroups()
 
-	listener, err := net.Listen("tcp", webport)
+	listener, err := net.Listen("tcp", clientport)
 	if err != nil {
 		log.Fatal("Не удалось запустить TCP сервер:", err)
 	}
@@ -34,8 +34,8 @@ func main() {
 	r := mux.NewRouter()
 	registerRoutes(r)
 
-	//	http.Handle("/", r)
+	http.Handle("/", r)
 
-	log.Println("HTTP сервер запущен на " + clientport)
-	log.Fatal(http.ListenAndServe(clientport, nil))
+	log.Println("HTTP сервер запущен на " + webport)
+	log.Fatal(http.ListenAndServe(webport, nil))
 }

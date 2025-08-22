@@ -18,7 +18,8 @@ func handleConnection(conn net.Conn) {
 	// Аутентификация
 	clientID, ip, hostname, isKnown, err := authenticateClient(conn)
 	if err != nil {
-		log.Println(err)
+		log.Printf("подключение от %v — отклонено. \n%v", conn.RemoteAddr(), err)
+		conn.Write([]byte("HTTP/1.1 400 Bad Request\r\nContent-Length: 18\r\n\r\nUse proper client!"))
 		return
 	}
 
