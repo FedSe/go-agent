@@ -45,7 +45,15 @@ func handleCommand(msg CommandMessage) ResponseMessage {
 
 		response.Data = formatRAMData(ramModules)
 		return response
-
+	case "gDISK":
+		response.Command = "gDISK"
+		disks, err := getDiskModules()
+		if err != nil {
+			response.Error = err.Error()
+			return response
+		}
+		response.Data = formatDiskData(disks)
+		return response
 	default:
 		// Выполнить как PS
 		script := `[Console]::OutputEncoding = [Text.Encoding]::UTF8;` + msg.Command

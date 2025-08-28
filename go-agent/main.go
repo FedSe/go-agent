@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/net"
 )
 
@@ -26,14 +25,11 @@ func main() {
 	switch runtime.GOOS {
 	case "windows":
 		//getHostname()
-		//getCPUInfo()
-		//getDiskInfo()
 		//getNetworkInfo()
 		//getCDROMInfoWindows()   //++
 		//getMonitorInfoWindows() //++
 		//getPrinterInfoWindows() //++
 		//getWiaDevicesWindows()  //++
-		//getGPUInfoWindows()     //++
 		//getWindowsServices()    //++
 		//getAVPExe()
 		//getAppsWindows()
@@ -41,6 +37,7 @@ func main() {
 		//printPythonInstalls()
 	case "linux":
 		getHostname()
+		getRAMInfoLinux()
 		getCDROMInfoLinux()
 		getMonitorInfoLinux()
 		getPrinterInfoLinux()
@@ -71,9 +68,27 @@ func getHostname() (string, error) {
 	return hostname, nil
 }
 
-// Перевод байт в гигабайты
-func toGB(b uint64) float64 {
-	return float64(b) / 1024 / 1024 / 1024
+// Перевод байт в другие размерности
+func formatBytes(b uint64) string {
+	const (
+		KB = 1024
+		MB = KB * 1024
+		GB = MB * 1024
+		TB = GB * 1024
+	)
+
+	switch {
+	case b >= TB:
+		return fmt.Sprintf("%.2f TB", float64(b)/TB)
+	case b >= GB:
+		return fmt.Sprintf("%.2f GB", float64(b)/GB)
+	case b >= MB:
+		return fmt.Sprintf("%.2f MB", float64(b)/MB)
+	case b >= KB:
+		return fmt.Sprintf("%.2f KB", float64(b)/KB)
+	default:
+		return fmt.Sprintf("%d B", b)
+	}
 }
 
 // Парс заголовков
@@ -100,19 +115,6 @@ func getRAMInfoLinux() {
 			strings.Contains(line, "Size") {
 			fmt.Println(line)
 		}
-	}
-}
-
-// Информация о дисках
-func getDiskInfo() {
-	diskParts, _ := disk.Partitions(false)
-	fmt.Println("\n--- Диски ---")
-	for _, part := range diskParts {
-		diskUsage, _ := disk.Usage(part.Mountpoint)
-		fmt.Printf("  Раздел: %s (%s)\n", part.Device, part.Fstype)
-		fmt.Printf("    Точка монтирования: %s\n", part.Mountpoint)
-		fmt.Printf("    Всего: %.2f GB\n", toGB(diskUsage.Total))
-		fmt.Printf("    Использовано: %.2f GB (%.2f%%)\n", toGB(diskUsage.Used), diskUsage.UsedPercent)
 	}
 }
 

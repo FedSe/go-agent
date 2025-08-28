@@ -68,11 +68,11 @@ func formatRAMData(modules []RAMModule) map[string]any {
 		response[prefix+"Manufacturer"] = m.Manufacturer
 		response[prefix+"PartNumber"] = m.PartNumber
 		response[prefix+"SerialNumber"] = m.SerialNumber
-		response[prefix+"CapacityGB"] = fmt.Sprintf("%.2f", toGB(m.CapacityBytes))
+		response[prefix+"Capacity"] = formatBytes(m.CapacityBytes)
 		response[prefix+"Speed"] = m.Speed
 	}
 
-	response["totalGB"] = fmt.Sprintf("%.2f", toGB(total))
+	response["total"] = formatBytes(total)
 
 	return response
 }
