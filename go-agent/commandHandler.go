@@ -27,13 +27,13 @@ func handleCommand(msg CommandMessage) ResponseMessage {
 		return response
 	case "gCPU":
 		response.Command = "gCPU"
-		cpuData, err := getCPUInfo()
+		ramModules, err := getCPUModules()
 		if err != nil {
 			response.Error = err.Error()
 			return response
 		}
 
-		response.Data = formatCPUData(cpuData)
+		response.Data = formatCPUData(ramModules)
 		return response
 	case "gRAM":
 		response.Command = "gRAM"

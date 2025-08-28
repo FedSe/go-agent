@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// wmic memorychip get Manufacturer,PartNumber,SerialNumber,Capacity,Speed
 type RAMModule struct {
 	Manufacturer  string
 	PartNumber    string

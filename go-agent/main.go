@@ -7,11 +7,10 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
-	"strconv"
+
 	"strings"
 	"time"
 
-	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/net"
 )
@@ -70,38 +69,6 @@ func getHostname() (string, error) {
 		return "", fmt.Errorf("ошибка при получении имени хоста: %s", err)
 	}
 	return hostname, nil
-}
-
-// Информация о CPU
-func getCPUInfo() ([]map[string]string, error) {
-	cpuInfos, err := cpu.Info()
-	if err != nil {
-		return nil, fmt.Errorf("ошибка при получении данных о CPU: %w", err)
-	}
-
-	var result []map[string]string
-	for _, info := range cpuInfos {
-		result = append(result, map[string]string{
-			"model":       info.ModelName,
-			"mhz":         fmt.Sprintf("%.2f", info.Mhz),
-			"cores":       strconv.Itoa(int(info.Cores)),
-			"physical_id": info.PhysicalID,
-		})
-	}
-
-	return result, nil
-}
-
-// Преобразует []map[string]string от getCPUInfo в map[string]any для отправки
-func formatCPUData(cpuData []map[string]string) map[string]any {
-	response := make(map[string]any)
-	for i, cpu := range cpuData {
-		prefix := fmt.Sprintf("cpu%d.", i)
-		for k, v := range cpu {
-			response[prefix+k] = v
-		}
-	}
-	return response
 }
 
 // Перевод байт в гигабайты

@@ -183,13 +183,14 @@ func processClientResponses(conn net.Conn, clientID string) {
 		}
 		saveClientList("clients_known.json", knownList)
 
-		// Лог результата
+		// Лог результата (консоль)
 		var parts []string
 		for k, v := range response.Data {
-			parts = append(parts, fmt.Sprintf("%s: %s", k, v))
+			parts = append(parts, fmt.Sprint(k, ": ", v, " |"))
 		}
 		fmt.Println(parts)
 
+		// Лог результата (файл)
 		logEntry := ClientLogEntry{
 			Time:    time.Now(),
 			Command: response.Command,
@@ -197,7 +198,8 @@ func processClientResponses(conn net.Conn, clientID string) {
 		}
 		addClientLog(clientID, logEntry)
 
-		logEntryStr := fmt.Sprintf("[%s | %s | %s] (%s) -> %s",
+		// Лог результата (веб)
+		logEntryStr := fmt.Sprintf("[%s | %s | %s] (%s) -> %v",
 			time.Now().Format("2006-01-02 15:04:05"),
 			clientID,
 			response.Command,
